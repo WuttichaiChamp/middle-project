@@ -78,5 +78,5 @@ res := &omsResponse.ShipmentResponse{
 ## Install
 
 ```bash
-go get github.com/your-org/common-models@v1.0.0
+go get github.com/prime-selection/common-models@v1.0.0
 ```
