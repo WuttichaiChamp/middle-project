@@ -1,4 +1,4 @@
-module github.com/prime-selection/common-models
+module github.com/Teeranuns000/middle-project
 
 go 1.21
 
