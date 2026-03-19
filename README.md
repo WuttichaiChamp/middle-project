@@ -80,3 +80,12 @@ res := &omsResponse.ShipmentResponse{
 ```bash
 go get github.com/prime-selection/common-models@v1.0.0
 ```
+
+## Flow update version when update models
+```
+git add .
+git commit -m "feat: add new field to Order model"
+git tag v1.1.0
+git push origin main
+git push origin v1.1.0
+```
