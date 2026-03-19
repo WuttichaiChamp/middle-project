@@ -14,6 +14,9 @@ type Shop struct {
 	PlatformCode        string     `json:"platform_code"`
 	IsAutoReconnectAuth bool       `json:"is_auto_reconnect_auth"`
 	IsActive            bool       `json:"is_active"`
+	AccessToken         string     `json:"access_token"`
+	RefreshToken        string     `json:"refresh_token"`
+	APIKey              string     `json:"api_key"`
 	CreateBy            string     `json:"create_by"`
 	CreateDtm           time.Time  `json:"create_dtm"`
 	UpdateBy            string     `json:"update_by"`
