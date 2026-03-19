@@ -29,7 +29,7 @@ type Order struct {
 	DocumentRefType     string      `json:"document_ref_type"`
 	DocumentRef         string      `json:"document_ref"`
 	Remark              string      `json:"remark"`
-	ExternalRef         string      `json:"external_ref"`
+	ExternalRef         string      `json:"external_ref"` //order id
 	CreateBy            string      `json:"create_by"`
 	CreateDtm           time.Time   `json:"create_dtm"`
 	UpdateBy            string      `json:"update_by"`
