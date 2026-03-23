@@ -34,7 +34,6 @@ var omsRegistry = map[string]interface{}{
 	"shop":                             &models.Shop{},
 	"shop_auth":                        &models.ShopAuth{},
 	"system_config":                    &models.SystemConfig{},
-	"order_log":                        &models.OrderLog{},
 }
 
 func MigrateOMS(tables []string) {
