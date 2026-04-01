@@ -25,7 +25,7 @@ type OrderPackage struct {
 	CreateDtm         time.Time          `json:"create_dtm"`
 	UpdateBy          string             `json:"update_by"`
 	UpdateDtm         time.Time          `json:"update_dtm"`
-	OrderPackageItems []OrderPackageItem `json:"order_package_items"`
+	OrderPackageItems []OrderPackageItem `gorm:"foreignKey:PackageID" json:"order_package_items"`
 }
 
 func (OrderPackage) TableName() string { return "order_package" }

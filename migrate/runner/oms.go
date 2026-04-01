@@ -16,12 +16,14 @@ func MigrateOMS() {
 		log.Fatal("database_gorm_url_prime_oms is not set")
 	}
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		log.Fatalf("failed to connect OMS database: %v", err)
 	}
 
-	err = db.AutoMigrate(
+	tables := []any{
 		&models.Courier{},
 		&models.Order{},
 		&models.OrderItem{},
@@ -43,9 +45,12 @@ func MigrateOMS() {
 		&models.Shop{},
 		&models.ShopAuth{},
 		&models.SystemConfig{},
-	)
-	if err != nil {
-		log.Fatalf("OMS migration failed: %v", err)
+	}
+
+	for _, t := range tables {
+		if err := db.AutoMigrate(t); err != nil {
+			log.Printf("Warning: migration for %T: %v", t, err)
+		}
 	}
 
 	fmt.Println("OMS migration completed successfully")

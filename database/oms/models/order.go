@@ -34,7 +34,7 @@ type Order struct {
 	CreateDtm           time.Time   `json:"create_dtm"`
 	UpdateBy            string      `json:"update_by"`
 	UpdateDtm           time.Time   `json:"update_dtm"`
-	OrderItems          []OrderItem `json:"order_items"`
+	OrderItems          []OrderItem `gorm:"foreignKey:OrderID" json:"order_items"`
 }
 
 func (Order) TableName() string { return "order" }
