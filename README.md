@@ -1,91 +1,167 @@
-# common-models
+# middle-project
 
-Single source of truth for shared data models across microservices.
+Single source of truth สำหรับ shared data models และ auto migration ข้าม microservices
 
 ## Project Structure
 
 ```
-common-models/
-├── user/
-│   ├── model/       # DB + business structs
-│   ├── request/     # API request DTOs
-│   └── response/    # API response DTOs
-├── order/
-│   ├── model/
-│   ├── request/
-│   └── response/
-├── wms/
-│   ├── model/
-│   ├── request/
-│   └── response/
-├── oms/
-│   ├── model/
-│   ├── request/
-│   └── response/
-└── shared/
-    └── model/       # Common types (Pagination, etc.)
+middle-project/
+├── database/
+│   ├── oms/
+│   │   └── models/      # GORM structs สำหรับ OMS database
+│   └── wms/
+│       └── models/      # GORM structs สำหรับ WMS database
+├── migrate/
+│   ├── main.go          # Entry point สำหรับรัน migration
+│   └── runner/
+│       ├── oms.go       # Migration logic สำหรับ OMS
+│       └── wms.go       # Migration logic สำหรับ WMS (ถ้ามี)
+├── shared/
+│   └── model/           # Common types เช่น Pagination
+├── .env
+└── go.mod
 ```
 
-## Naming Convention
+---
 
-| Layer | Package | Example |
-|-------|---------|---------|
-| DB model | `model` | `ShipmentRow` |
-| Business model | `model` | `Shipment` |
-| Request DTO | `request` | `CreateShipmentRequest` |
-| Response DTO | `response` | `ShipmentResponse` |
+## Auto Migration
 
-## Usage
+### วิธีรัน
+
+```bash
+go run ./migrate/main.go
+```
+
+### เพิ่ม Table ใหม่
+
+1. สร้าง struct ใน `database/oms/models/` เช่น `warehouse.go`
 
 ```go
+package models
+
 import (
-    omsModel    "github.com/your-org/common-models/oms/model"
-    omsRequest  "github.com/your-org/common-models/oms/request"
-    omsResponse "github.com/your-org/common-models/oms/response"
+    "time"
+    "github.com/google/uuid"
 )
 
-// Use model
-var row omsModel.ShipmentRow
-db.Get(&row, "SELECT * FROM shipments WHERE id = ?", id)
+type Warehouse struct {
+    ID            uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+    WarehouseCode string    `json:"warehouse_code"`
+    WarehouseName string    `json:"warehouse_name"`
+    IsActive      bool      `json:"is_active"`
+    CreateBy      string    `json:"create_by"`
+    CreateDtm     time.Time `json:"create_dtm"`
+}
 
-// Use request DTO
-var req omsRequest.CreateShipmentRequest
-json.Unmarshal(body, &req)
+func (Warehouse) TableName() string { return "warehouse" }
+```
 
-// Use response DTO
-res := &omsResponse.ShipmentResponse{
-    ID:     row.ID,
-    Status: row.Status,
+2. เปิด comment ใน `migrate/runner/oms.go`
+
+```go
+tables := []any{
+    // comment table ที่ไม่ต้องการแตะ
+    // &models.Order{},
+    // &models.Shop{},
+
+    // เปิดเฉพาะที่ต้องการ migrate
+    &models.Warehouse{},
 }
 ```
 
-## Rules
-
-- ห้าม define struct ซ้ำใน service
-- ห้าม import ข้าม domain โดยไม่จำเป็น
-- ต้อง lock version เสมอ ห้ามใช้ `@latest`
-- เฉพาะ owner เท่านั้นที่แก้ไข domain ของตัวเองได้
-
-## Domain Ownership
-
-| Domain | Owner |
-|--------|-------|
-| user/* | user-service |
-| order/* | order-service |
-| wms/* | wms-service |
-| oms/* | oms-service |
-
-## Install
+3. รัน migration
 
 ```bash
-go get github.com/prime-selection/common-models@v1.0.0
+go run ./migrate/main.go
 ```
 
-## Flow update version when update models
+> GORM `AutoMigrate` จะ skip table ที่มีอยู่แล้ว และสร้างเฉพาะ table/column ใหม่เท่านั้น ไม่ลบ data เดิม
+
+### หลาย Database
+
+แต่ละ database มี runner แยกกัน ควบคุมได้จาก `migrate/main.go`
+
+```go
+// main.go
+runner.MigrateOMS() // comment ถ้าไม่ต้องการแตะ OMS
+runner.MigrateWMS() // comment ถ้าไม่ต้องการแตะ WMS
 ```
+
+### .env
+
+```env
+database_gorm_url_prime_oms=host=<host> user=<user> password=<password> dbname=<dbname> port=5432 sslmode=disable
+database_gorm_url_prime_wms=host=<host> user=<user> password=<password> dbname=<dbname> port=5432 sslmode=disable
+```
+
+---
+
+## ใช้ Models ข้าม Repo (Private Repo)
+
+### 1. ตั้งค่า GONOSUMCHECK และ GOFLAGS (ทำครั้งเดียว)
+
+เนื่องจาก repo นี้เป็น private ต้องบอก Go ให้ข้าม checksum database
+
+```bash
+go env -w GONOSUMCHECK=github.com/Teeranuns000/*
+go env -w GONOSUMDB=github.com/Teeranuns000/*
+go env -w GOPRIVATE=github.com/Teeranuns000/*
+```
+
+### 2. ตั้งค่า Git ให้ใช้ SSH แทน HTTPS
+
+```bash
+git config --global url."git@github.com:".insteadOf "https://github.com/"
+```
+
+หรือถ้าใช้ Personal Access Token (PAT):
+
+```bash
+git config --global url."https://<YOUR_TOKEN>@github.com/".insteadOf "https://github.com/"
+```
+
+### 3. ติดตั้ง package ใน repo ปลายทาง
+
+```bash
+go get github.com/Teeranuns000/middle-project@v1.0.0
+```
+
+> ต้อง tag version ก่อนเสมอ ห้ามใช้ `@latest` ใน production
+
+### 4. Import และใช้งาน
+
+```go
+import (
+    omsModels "github.com/Teeranuns000/middle-project/database/oms/models"
+)
+
+var shop omsModels.Shop
+db.First(&shop, "shop_code = ?", "SHOP001")
+```
+
+### 5. Update Version
+
+เมื่อมีการแก้ไข model ให้ทำตามขั้นตอนนี้
+
+```bash
 git add .
-git commit -m "feat: add new field to Order model"
+git commit -m "feat: add Warehouse model"
 git tag v1.1.0
 git push origin main
 git push origin v1.1.0
 ```
+
+แล้วใน repo ปลายทางรัน:
+
+```bash
+go get github.com/Teeranuns000/middle-project@v1.1.0
+```
+
+---
+
+## Rules
+
+- ห้าม define struct ซ้ำใน service ให้ import จาก repo นี้เท่านั้น
+- ต้อง lock version เสมอ
+- ถ้ามี relation (has many) ต้องใส่ `gorm:"foreignKey:XxxID"` ด้วยทุกครั้ง
+- comment table ที่ไม่ต้องการแตะก่อนรัน migration เสมอ
