@@ -122,11 +122,19 @@ git config --global url."https://<YOUR_TOKEN>@github.com/".insteadOf "https://gi
 
 ### 3. ติดตั้ง package ใน repo ปลายทาง
 
+ถ้าทีมมีการสื่อสารและ sync กันดี สามารถดึงตรงจาก branch ได้เลยโดยไม่ต้อง tag version
+
+```bash
+go get github.com/Teeranuns000/middle-project@main
+```
+
+> ใช้ `@main` แทน `@latest` เพราะ `@latest` ใน Go ดึงเฉพาะ tag ล่าสุด ถ้าไม่มี tag จะ error
+
+หรือถ้าต้องการ lock version เพื่อความปลอดภัย
+
 ```bash
 go get github.com/Teeranuns000/middle-project@v1.0.0
 ```
-
-> ต้อง tag version ก่อนเสมอ ห้ามใช้ `@latest` ใน production
 
 ### 4. Import และใช้งาน
 
@@ -162,6 +170,6 @@ go get github.com/Teeranuns000/middle-project@v1.1.0
 ## Rules
 
 - ห้าม define struct ซ้ำใน service ให้ import จาก repo นี้เท่านั้น
-- ต้อง lock version เสมอ
+- ถ้าทีม sync กันดีสามารถใช้ `@main` ได้เลย ไม่จำเป็นต้อง tag version
 - ถ้ามี relation (has many) ต้องใส่ `gorm:"foreignKey:XxxID"` ด้วยทุกครั้ง
 - comment table ที่ไม่ต้องการแตะก่อนรัน migration เสมอ
