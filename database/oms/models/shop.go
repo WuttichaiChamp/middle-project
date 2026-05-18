@@ -12,8 +12,14 @@ type Shop struct {
 	ShopName            string     `json:"shop_name"`
 	Email               string     `json:"email"`
 	PlatformCode        string     `json:"platform_code"`
+	ExternalShopID      string     `gorm:"type:text" json:"external_shop_id"`
 	IsAutoReconnectAuth bool       `json:"is_auto_reconnect_auth"`
 	IsActive            bool       `json:"is_active"`
+	AutoDownloadDataFlg bool       `json:"auto_download_data_flg"`
+	LastSyncedDtm       *time.Time `json:"last_synced_dtm"`
+	SyncStatusEnabled   bool       `json:"sync_status_enabled"`
+	IsSelfFulfilled     bool       `json:"is_self_fulfilled"`
+	IsDefaultCourier    string     `json:"is_default_courier"`
 	AccessToken         string     `json:"access_token"`
 	RefreshToken        string     `json:"refresh_token"`
 	APIKey              string     `json:"api_key"`
