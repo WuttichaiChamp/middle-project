@@ -10,6 +10,7 @@ type OrderPackage struct {
 	ID                uuid.UUID          `gorm:"type:uuid;primaryKey" json:"id"`
 	PackageCode       string             `json:"package_code"`
 	ShopCode          string             `json:"shop_code"`
+	IsCod             bool               `json:"is_cod"`
 	DocumentRef       string             `json:"document_ref"`
 	CourierCode       string             `json:"courier_code"`
 	TrackingNo        string             `json:"tracking_no"`

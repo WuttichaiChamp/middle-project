@@ -8,7 +8,7 @@ import (
 
 type Order struct {
 	ID                          uuid.UUID   `gorm:"type:uuid;primaryKey" json:"id"`
-	OrderCode                   string      `json:"order_code"`
+	OrderCode                   string      `gorm:"uniqueIndex" json:"order_code"`
 	OrderType                   string      `json:"order_type"`
 	OrderDate                   *time.Time  `json:"order_date"`
 	ShopCode                    string      `json:"shop_code"`
@@ -47,7 +47,6 @@ type Order struct {
 	Country                     string      `json:"country"`
 	District                    string      `json:"district"`
 	Email                       string      `json:"email"`
-	PhoneNumber                 string      `json:"phone_number"`
 	PostalCode                  string      `json:"postal_code"`
 	Province                    string      `json:"province"`
 	RecipientName               string      `json:"recipient_name"`
