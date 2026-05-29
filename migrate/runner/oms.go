@@ -25,13 +25,14 @@ func MigrateOMS() {
 	}
 
 	tables := []any{
-		&models.Courier{},
-		&models.Shipment{},
-		&models.ShipmentItem{},
+		// &models.Courier{},
+		// &models.Shipment{},
+		// &models.ShipmentItem{},
 		// &models.Order{},
-		&models.OrderItem{},
-		&models.OrderPackage{},
-		&models.OrderPackageItem{},
+		// &models.OrderItem{},
+		// &models.OrderPackage{},
+		// &models.OrderPackageItem{},
+		&models.PlatformStatement{},
 		// &models.Platform{},
 		// &models.PlatformLog{},
 		// &models.Promotion{},
@@ -45,8 +46,8 @@ func MigrateOMS() {
 		// &models.QuotationItem{},
 		// &models.SalesOrder{},
 		// &models.SalesOrderItem{},
-		&models.Shop{},
-		&models.ShopAuth{},
+		// &models.Shop{},
+		// &models.ShopAuth{},
 		// &models.SystemConfig{},
 	}
 
